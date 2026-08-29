@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mega HTML Editor - Mobile</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* --- Top Bar: minimal --- */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: #1e1e2f;
+      border-bottom: 1px solid #2d2d44;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .top-bar .brand {
+      font-size: 16px;
+      font-weight: 700;
+      color: #00d4ff;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .top-bar .btn {
+      background: #2d2d44;
+      border: none;
+      color: #eee;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .top-bar .btn-primary { background: #0ead69; color: #fff; }
+    .top-bar .btn-primary:hover { background: #0c8c54; }
+    .top-bar .btn-accent { background: #17a2b8; color: #fff; }
+    .top-bar .btn-accent:hover { background: #138496; }
+    .top-bar .btn-warn { background: #e94560; color: #fff; }
+    .top-bar .btn-warn:hover { background: #c73b54; }
+    .top-bar .btn-run { background: #fd7e14; color: #fff; }
+    .top-bar .btn-run:hover { background: #e56b0a; }
+    .top-bar .btn-outline { background: transparent; border: 1px solid #3a3a55; }
+    .top-bar .btn-outline:hover { background: #2d2d44; }
+    input[type="file"] { display: none; }
+
+    /* --- Toolbar: collapsible with toggle --- */
+    .toolbar-wrap {
+      background: #1a1a2e;
+      border-bottom: 1px solid #2d2d44;
+      flex-shrink: 0;
+    }
+    .toolbar-toggle {
+      display: flex;
+      justify-content: center;
+      padding: 4px 0 0 0;
+      cursor: pointer;
+      color: #888;
+      font-size: 11px;
+      letter-spacing: 1px;
+      background: #1a1a2e;
+      border: none;
+      width: 100%;
+    }
+    .toolbar-toggle:hover { color: #00d4ff; }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      padding: 6px 8px 10px 8px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease, padding 0.25s ease;
+      background: #1a1a2e;
+    }
+    .toolbar.open {
+      max-height: 700px;
+      padding: 6px 8px 10px 8px;
+      overflow-y: auto;
+    }
+    .tool-group {
+      display: flex;
+      gap: 2px;
+      padding: 2px 4px;
+      border-right: 1px solid #2d2d44;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .tool-group:last-child { border-right: none; }
+    .tool-btn {
+      background: #252540;
+      color: #e0e0e0;
+      border: 1px solid #3a3a55;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      min-width: 28px;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .tool-btn:hover { background: #00d4ff; color: #000; border-color: #00d4ff; }
+    .tool-select {
+      background: #252540;
+      color: #e0e0e0;
+      border: 1px solid #3a3a55;
+      padding: 3px 4px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      max-width: 80px;
+    }
+    .color-picker {
+      width: 26px;
+      height: 26px;
+      border: 1px solid #3a3a55;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #252540;
+      padding: 0;
+    }
+
+    /* --- Page Nav: compact --- */
+    .page-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 10px;
+      background: #16162a;
+      border-bottom: 1px solid #2d2d44;
+      flex-shrink: 0;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .page-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .page-nav button {
+      background: #252540;
+      color: #e0e0e0;
+      border: 1px solid #3a3a55;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .page-nav button:hover { background: #00d4ff; color: #000; }
+    .page-info {
+      font-size: 12px;
+      color: #aaa;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .page-info input {
+      width: 40px;
+      text-align: center;
+      background: #1e1e2f;
+      color: #fff;
+      border: 1px solid #3a3a55;
+      border-radius: 4px;
+      padding: 2px;
+      font-size: 12px;
+    }
+    .page-ops button {
+      background: #e94560;
+      color: white;
+      border: none;
+      padding: 3px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-left: 2px;
+    }
+    .page-ops button:first-child { background: #0ead69; }
+
+    /* --- Editor: maximum space --- */
+    .editor-wrapper {
+      flex: 1;
+      overflow: auto;
+      padding: 12px;
+      background: #0a0a15;
+      display: flex;
+      gap: 12px;
+    }
+    #editor {
+      background: #ffffff;
+      color: #222222;
+      min-height: 80vh;
+      max-width: 100%;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12pt;
+      line-height: 1.6;
+      outline: none;
+      border-radius: 2px;
+      flex: 1;
+    }
+    #editor:focus { box-shadow: 0 2px 20px rgba(0, 212, 255, 0.15); }
+    #editor p { margin: 0 0 10px 0; }
+    #editor h1, #editor h2, #editor h3 { margin: 14px 0 6px 0; color: #111; }
+    #editor table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+    #editor td, #editor th { border: 1px solid #bbb; padding: 6px; color: #222; }
+    #editor img { max-width: 100%; height: auto; }
+    #editor a { color: #0066cc; }
+    .page-break {
+      page-break-after: always;
+      border-bottom: 2px dashed #e94560;
+      margin: 16px 0;
+      text-align: center;
+      color: #e94560;
+      font-size: 10px;
+      padding: 6px;
+      background: #fff0f3;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* --- Output preview (hidden by default) --- */
+    #outputFrame {
+      display: none;
+      background: #fff;
+      width: 100%;
+      min-height: 80vh;
+      border: none;
+      border-radius: 4px;
+      flex: 1;
+    }
+    #outputFrame.active {
+      display: block;
+    }
+    #editor.hidden {
+      display: none;
+    }
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .view-toggle .btn {
+      font-size: 11px;
+      padding: 3px 8px;
+    }
+    .view-toggle .btn.active-view {
+      background: #00d4ff;
+      color: #000;
+    }
+
+    /* --- Status: minimal --- */
+    .status-bar {
+      display: flex;
+      gap: 16px;
+      padding: 4px 12px;
+      background: #1e1e2f;
+      border-top: 1px solid #2d2d44;
+      font-size: 11px;
+      color: #888;
+      justify-content: center;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-box {
+      background: #1e1e2f;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #3a3a55;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal-box h2 { color: #00d4ff; margin-bottom: 10px; font-size: 18px; }
+    .modal-box p { color: #aaa; margin-bottom: 16px; line-height: 1.4; font-size: 14px; }
+    .modal-box button { margin-top: 6px; }
+
+    /* responsive tweaks */
+    @media (max-width: 480px) {
+      .top-bar .brand { font-size: 14px; }
+      .top-bar .btn { font-size: 11px; padding: 3px 7px; }
+      #editor { padding: 14px 16px; font-size: 11pt; }
+      .page-nav button { font-size: 11px; padding: 2px 6px; }
+      .page-info { font-size: 11px; }
+      .page-info input { width: 34px; }
+      .tool-btn { font-size: 11px; padding: 3px 6px; min-width: 24px; }
+      .tool-select { font-size: 10px; max-width: 60px; }
+      .editor-wrapper { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== TOP BAR: minimal ===== -->
+  <div class="top-bar">
+    <span class="brand">📝 Edit</span>
+    <button class="btn btn-primary" onclick="newDocument()">➕New</button>
+    <button class="btn btn-accent" onclick="document.getElementById('fileInput').click()">📂Open</button>
+    <input type="file" id="fileInput" accept=".html,.htm,.txt,.doc,.docx" onchange="openFile(this)">
+    <button class="btn btn-run" onclick="runHTML()">▶ Run</button>
+    <button class="btn btn-warn" onclick="saveAs('html')">💾Save</button>
+    <button class="btn btn-outline" onclick="showSaveOptions()">⬇More</button>
+    <div class="view-toggle">
+      <button class="btn btn-outline active-view" id="viewEditBtn" onclick="setView('edit')">✏️</button>
+      <button class="btn btn-outline" id="viewOutputBtn" onclick="setView('output')">👁️</button>
+    </div>
+  </div>
+
+  <!-- ===== TOOLBAR: collapsible ===== -->
+  <div class="toolbar-wrap">
+    <button class="toolbar-toggle" id="toggleToolbar" onclick="toggleToolbar()">▼ FORMAT ▼</button>
+    <div class="toolbar" id="toolbarContent">
+      <div class="tool-group">
+        <button class="tool-btn" onclick="execCmd('bold')"><b>B</b></button>
+        <button class="tool-btn" onclick="execCmd('italic')"><i>I</i></button>
+        <button class="tool-btn" onclick="execCmd('underline')"><u>U</u></button>
+        <button class="tool-btn" onclick="execCmd('strikeThrough')"><s>S</s></button>
+      </div>
+      <div class="tool-group">
+        <button class="tool-btn" onclick="execCmd('justifyLeft')">⬅</button>
+        <button class="tool-btn" onclick="execCmd('justifyCenter')">↔</button>
+        <button class="tool-btn" onclick="execCmd('justifyRight')">➡</button>
+        <button class="tool-btn" onclick="execCmd('justifyFull')">⬌</button>
+      </div>
+      <div class="tool-group">
+        <button class="tool-btn" onclick="execCmd('insertUnorderedList')">•</button>
+        <button class="tool-btn" onclick="execCmd('insertOrderedList')">1.</button>
+        <button class="tool-btn" onclick="execCmd('outdent')">←|</button>
+        <button class="tool-btn" onclick="execCmd('indent')">|→</button>
+      </div>
+      <div class="tool-group">
+        <select class="tool-select" onchange="execCmd('fontName', this.value); this.value=''">
+          <option value="">Font</option>
+          <option value="Arial">Arial</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Times New Roman">Times</option>
+          <option value="Courier New">Courier</option>
+          <option value="Verdana">Verdana</option>
+        </select>
+        <select class="tool-select" onchange="execCmd('fontSize', this.value); this.value=''">
+          <option value="">Size</option>
+          <option value="1">8</option><option value="2">10</option><option value="3">12</option>
+          <option value="4">14</option><option value="5">18</option><option value="6">24</option><option value="7">36</option>
+        </select>
+        <input type="color" class="color-picker" onchange="execCmd('foreColor', this.value)" title="Color">
+        <input type="color" class="color-picker" onchange="execCmd('hiliteColor', this.value)" value="#ffff00" title="Highlight">
+      </div>
+      <div class="tool-group">
+        <button class="tool-btn" onclick="execCmd('removeFormat')">🧹</button>
+        <button class="tool-btn" onclick="execCmd('undo')">↩</button>
+        <button class="tool-btn" onclick="execCmd('redo')">↪</button>
+      </div>
+      <div class="tool-group">
+        <button class="tool-btn" onclick="insertLink()">🔗</button>
+        <button class="tool-btn" onclick="insertImage()">🖼</button>
+        <button class="tool-btn" onclick="insertTable()">▦</button>
+        <button class="tool-btn" onclick="execCmd('insertHorizontalRule')">―</button>
+        <button class="tool-btn" onclick="insertPageBreak()" style="background:#e94560;color:#fff;">⤶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PAGE NAV ===== -->
+  <div class="page-bar">
+    <div class="page-nav">
+      <button onclick="firstPage()">⏮</button>
+      <button onclick="prevPage()">◀</button>
+      <span class="page-info">
+        <input type="number" id="pageInput" value="1" min="1" onchange="goToPage(this.value)"> / <span id="totalPages">1</span>
+      </span>
+      <button onclick="nextPage()">▶</button>
+      <button onclick="lastPage()">⏭</button>
+    </div>
+    <div class="page-ops">
+      <button onclick="addPage()">+</button>
+      <button onclick="deletePage()">−</button>
+    </div>
+  </div>
+
+  <!-- ===== EDITOR + OUTPUT ===== -->
+  <div class="editor-wrapper">
+    <div id="editor" contenteditable="true" spellcheck="false"></div>
+    <iframe id="outputFrame"></iframe>
+  </div>
+
+  <!-- ===== STATUS ===== -->
+  <div class="status-bar">
+    <span id="wordCount">Words: 0</span>
+    <span id="charCount">Chars: 0</span>
+    <span id="pageCountDisplay">Pages: 1</span>
+    <span id="cursorPos">Ln 1, Col 1</span>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-box">
+      <h2 id="modalTitle">Notice</h2>
+      <p id="modalText">Message</p>
+      <button class="btn btn-accent" onclick="closeModal()">OK</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== STATE =====
+    let pages = ['<p>Welcome to Mega Editor! Start typing...</p>'];
+    let currentPage = 0;
+    const editor = document.getElementById('editor');
+    const outputFrame = document.getElementById('outputFrame');
+    const pageInput = document.getElementById('pageInput');
+    const totalPagesEl = document.getElementById('totalPages');
+    let currentView = 'edit'; // 'edit' or 'output'
+
+    // ===== TOOLBAR TOGGLE =====
+    let toolbarOpen = false;
+    function toggleToolbar() {
+      toolbarOpen = !toolbarOpen;
+      document.getElementById('toolbarContent').classList.toggle('open', toolbarOpen);
+      document.getElementById('toggleToolbar').textContent = toolbarOpen ? '▲ HIDE ▲' : '▼ FORMAT ▼';
+    }
+
+    // ===== VIEW TOGGLE =====
+    function setView(view) {
+      currentView = view;
+      const editorEl = document.getElementById('editor');
+      const outputEl = document.getElementById('outputFrame');
+      const editBtn = document.getElementById('viewEditBtn');
+      const outBtn = document.getElementById('viewOutputBtn');
+
+      if (view === 'edit') {
+        editorEl.classList.remove('hidden');
+        outputEl.classList.remove('active');
+        editBtn.classList.add('active-view');
+        outBtn.classList.remove('active-view');
+      } else {
+        editorEl.classList.add('hidden');
+        outputEl.classList.add('active');
+        editBtn.classList.remove('active-view');
+        outBtn.classList.add('active-view');
+        updateOutput();
+      }
+    }
+
+    // ===== RUN HTML =====
+    function runHTML() {
+      saveCurrent();
+      // Build full HTML document from current page content
+      let content = pages[currentPage];
+      // Wrap in full HTML if it doesn't look like a full document
+      if (!content.match(/<!DOCTYPE/i) && !content.match(/<html/i)) {
+        content = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Output</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+    img { max-width: 100%; height: auto; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border: 1px solid #ccc; padding: 8px; }
+  </style>
+</head>
+<body>
+${content}
+</body>
+</html>`;
+      }
+      // Open in new tab
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(content);
+        win.document.close();
+        showModal('Running', 'HTML opened in new tab.');
+      } else {
+        showModal('Popup Blocked', 'Please allow popups for this site to run HTML.');
+      }
+    }
+
+    // ===== UPDATE OUTPUT PREVIEW =====
+    function updateOutput() {
+      saveCurrent();
+      let content = pages[currentPage];
+      if (!content.match(/<!DOCTYPE/i) && !content.match(/<html/i)) {
+        content = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+    img { max-width: 100%; height: auto; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border: 1px solid #ccc; padding: 8px; }
+  </style>
+</head>
+<body>
+${content}
+</body>
+</html>`;
+      }
+      const blob = new Blob([content], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      outputFrame.src = url;
+      // Clean up old URL after load
+      outputFrame.onload = function() { URL.revokeObjectURL(url); };
+    }
+
+    // ===== DISPLAY =====
+    function updateDisplay() {
+      editor.innerHTML = pages[currentPage] || '<p></p>';
+      pageInput.value = currentPage + 1;
+      totalPagesEl.textContent = pages.length;
+      document.getElementById('pageCountDisplay').textContent = 'Pages: ' + pages.length;
+      updateStats();
+      if (currentView === 'output') updateOutput();
+    }
+
+    function saveCurrent() {
+      pages[currentPage] = editor.innerHTML;
+    }
+
+    // ===== DOCUMENT ACTIONS =====
+    function newDocument() {
+      if (!confirm('Start new document? Unsaved changes lost.')) return;
+      pages = ['<p></p>'];
+      currentPage = 0;
+      updateDisplay();
+      showModal('New Document', 'Blank document created. Up to 5000 pages.');
+    }
+
+    // ===== FORMATTING =====
+    function execCmd(cmd, val = null) {
+      document.execCommand(cmd, false, val);
+      editor.focus();
+      updateStats();
+    }
+
+    function insertLink() {
+      const url = prompt('Enter URL:');
+      if (url) execCmd('createLink', url);
+    }
+    function insertImage() {
+      const url = prompt('Image URL:');
+      if (url) execCmd('insertImage', url);
+    }
+    function insertTable() {
+      const rows = parseInt(prompt('Rows:', '3')) || 3;
+      const cols = parseInt(prompt('Columns:', '3')) || 3;
+      let html = '<table style="border-collapse:collapse;width:100%;border:1px solid #bbb;"><tbody>';
+      for (let i = 0; i < rows; i++) {
+        html += '<tr>';
+        for (let j = 0; j < cols; j++) html += '<td style="border:1px solid #bbb;padding:6px;">Cell</td>';
+        html += '</tr>';
+      }
+      html += '</tbody></table><p></p>';
+      execCmd('insertHTML', html);
+    }
+    function insertPageBreak() {
+      execCmd('insertHTML', '<div class="page-break">--- PAGE BREAK ---</div><p></p>');
+    }
+
+    // ===== PAGE NAVIGATION =====
+    function prevPage() {
+      if (currentPage > 0) { saveCurrent(); currentPage--; updateDisplay(); }
+      else showModal('Navigation', 'Already on first page.');
+    }
+    function nextPage() {
+      if (currentPage < pages.length - 1) { saveCurrent(); currentPage++; updateDisplay(); }
+      else showModal('Navigation', 'Last page. Click "+" to add more.');
+    }
+    function firstPage() { saveCurrent(); currentPage = 0; updateDisplay(); }
+    function lastPage() { saveCurrent(); currentPage = pages.length - 1; updateDisplay(); }
+
+    function goToPage(n) {
+      n = parseInt(n);
+      if (n >= 1 && n <= pages.length) { saveCurrent(); currentPage = n - 1; updateDisplay(); }
+      else { pageInput.value = currentPage + 1; showModal('Invalid', 'Page 1 to ' + pages.length); }
+    }
+
+    function addPage() {
+      if (pages.length >= 5000) { showModal('Limit', 'Max 5000 pages.'); return; }
+      saveCurrent();
+      pages.splice(currentPage + 1, 0, '<p></p>');
+      currentPage++;
+      updateDisplay();
+    }
+    function deletePage() {
+      if (pages.length <= 1) { showModal('Cannot Delete', 'Must keep at least one page.'); return; }
+      if (!confirm('Delete page ' + (currentPage + 1) + '?')) return;
+      pages.splice(currentPage, 1);
+      if (currentPage >= pages.length) currentPage = pages.length - 1;
+      updateDisplay();
+    }
+
+    // ===== OPEN FILE =====
+    function openFile(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const content = e.target.result;
+        try {
+          if (file.name.endsWith('.txt')) {
+            const parts = content.split(/\n={10,}\n/);
+            pages = parts.length > 1 ? parts.map(p => '<p>' + p.replace(/\n/g, '<br>') + '</p>') : ['<p>' + content.replace(/\n/g, '<br>') + '</p>'];
+          } else {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(content, 'text/html');
+            const body = doc.body;
+            const breaks = body.querySelectorAll('.page-break, [style*="page-break"], hr');
+            if (breaks.length > 0) {
+              pages = [];
+              let current = '';
+              body.childNodes.forEach(node => {
+                if (node.nodeType === 1 && (node.classList?.contains('page-break') || node.style?.pageBreakAfter || node.tagName === 'HR')) {
+                  pages.push(current || '<p></p>');
+                  current = '';
+                } else {
+                  current += node.outerHTML || (node.textContent || '');
+                }
+              });
+              if (current) pages.push(current);
+              if (pages.length === 0) pages = [body.innerHTML];
+            } else {
+              pages = [body.innerHTML];
+            }
+          }
+          currentPage = 0;
+          updateDisplay();
+          showModal('Opened', '"' + file.name + '" loaded. Pages: ' + pages.length);
+        } catch (err) {
+          showModal('Error', 'Could not read file: ' + err.message);
+        }
+        input.value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    // ===== SAVE OPTIONS =====
+    function showSaveOptions() {
+      const choice = confirm('Save as HTML? Click OK.\nCancel for more options.');
+      if (choice) {
+        saveAs('html');
+      } else {
+        const fmt = prompt('Save as: "txt" or "doc"', 'txt');
+        if (fmt === 'txt' || fmt === 'doc') saveAs(fmt);
+        else if (fmt !== null) showModal('Format', 'Use "txt" or "doc"');
+      }
+    }
+
+    function saveAs(format) {
+      saveCurrent();
+      let content = '', mime = '', ext = '.html', filename = 'MyDocument';
+
+      if (format === 'html') {
+        let body = '';
+        pages.forEach((p, i) => { body += p; if (i < pages.length - 1) body += '<div style="page-break-after:always;"></div>'; });
+        content = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>MyDocument</title>
+        <style>body{font-family:'Times New Roman',serif;max-width:816px;margin:40px auto;padding:60px 72px;line-height:1.6;color:#222;background:#fff;}
+        p{margin:0 0 12px 0;}h1,h2,h3{color:#111;}table{border-collapse:collapse;width:100%;}td,th{border:1px solid #ccc;padding:8px;}
+        img{max-width:100%;}a{color:#0066cc;}</style></head><body>${body}</body></html>`;
+        mime = 'text/html'; ext = '.html';
+      } else if (format === 'txt') {
+        const div = document.createElement('div');
+        pages.forEach((p, i) => { div.innerHTML = p; content += div.innerText; if (i < pages.length - 1) content += '\n\n========== PAGE BREAK ==========\n\n'; });
+        mime = 'text/plain'; ext = '.txt';
+      } else if (format === 'doc') {
+        let body = '';
+        pages.forEach((p, i) => { body += p; if (i < pages.length - 1) body += '<div style="page-break-after:always;"></div>'; });
+        content = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+        <head><meta charset="utf-8"><title>MyDocument</title>
+        <style>body{font-family:'Times New Roman',serif;font-size:12pt;line-height:1.6;}p{margin:0 0 12pt 0;}</style>
+        </head><body>${body}</body></html>`;
+        mime = 'application/msword'; ext = '.doc';
+      }
+
+      const blob = new Blob([content], { type: mime });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename + ext;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      showModal('Saved!', 'File saved as ' + ext.toUpperCase());
+    }
+
+    // ===== STATS =====
+    function updateStats() {
+      const text = editor.innerText || '';
+      const words = text.trim().split(/\s+/).filter(w => w).length;
+      document.getElementById('wordCount').textContent = 'Words: ' + words;
+      document.getElementById('charCount').textContent = 'Chars: ' + text.length;
+
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        const pre = range.startContainer.textContent ? range.startContainer.textContent.substring(0, range.startOffset) : '';
+        const lines = pre.split('\n').length;
+        const cols = pre.length - pre.lastIndexOf('\n');
+        document.getElementById('cursorPos').textContent = 'Ln ' + lines + ', Col ' + (cols < 0 ? 1 : cols);
+      }
+    }
+
+    // ===== MODAL =====
+    function showModal(title, text) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalText').textContent = text;
+      document.getElementById('modal').style.display = 'flex';
+    }
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    // ===== EVENTS =====
+    editor.addEventListener('input', function() {
+      updateStats();
+      if (currentView === 'output') updateOutput();
+    });
+    editor.addEventListener('keyup', updateStats);
+    editor.addEventListener('click', updateStats);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 's') { e.preventDefault(); saveAs('html'); }
+        if (e.key === 'o') { e.preventDefault(); document.getElementById('fileInput').click(); }
+        if (e.key === 'n') { e.preventDefault(); newDocument(); }
+        if (e.key === 'r') { e.preventDefault(); runHTML(); }
+      }
+      // F5 to run
+      if (e.key === 'F5') { e.preventDefault(); runHTML(); }
+    });
+
+    // ===== START =====
+    updateDisplay();
+    // auto-open toolbar on mobile? we keep closed by default to save space.
+  </script>
+
+</body>
+</html>
